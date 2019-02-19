@@ -1,0 +1,17 @@
+{
+  "name": "agent-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node app.js"
+  },
+  "author": "brightsu <bright.su@outlook.com>",
+  "license": "MIT",
+  "dependencies": {
+    "base-coder": "^1.0.3",
+    "cookies": "^0.7.3",
+    "superagent": "^4.1.0"
+  }
+}

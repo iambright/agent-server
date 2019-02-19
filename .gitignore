@@ -1,0 +1,15 @@
+# git ignore
+
+#folder
+
+/node_modules/
+/log/
+/.idea
+
+#file type
+
+#file
+*.log
+/local.js
+!/update.sh
+yarn.lock

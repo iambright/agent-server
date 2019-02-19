@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>agent-request</title>
+    <style>
+        *{
+            box-sizing: border-box;
+        }
+        form{
+            padding-top:50px;
+            text-align: center;
+        }
+        .url{
+            width: 400px;
+            border:1px solid #aaa;
+            line-height: 40px;
+            height: 40px;
+            padding: 0 10px;
+            font-size: 17px;
+            color:#333;
+        }
+        .btn{
+            border:1px solid #aaa;
+            line-height: 40px;
+            height: 40px;
+            padding: 0 30px;
+            cursor: pointer;
+        }
+        .name{
+            color:#0a7bbc;
+            display: block;
+            padding: 0 10px;
+            line-height: 60px;
+            height: 90px;
+            font-size: 38px;
+        }
+    </style>
+</head>
+<body>
+    <form method="post" enctype="application/x-www-form-urlencoded">
+        <h1 class="name">Agent Server</h1>
+        <input type="text" class="url" id="url" name="url" value="https://www.google.com" placeholder="请输入网址:http://"/>
+        <input type="submit" class="btn" name="action" value="GO"/>
+        <input type="submit" class="btn" name="action" value="Domain"/>
+    </form>
+</body>
+</html>
