@@ -55,6 +55,26 @@ module.exports = class AgentServer {
                 let headers = req.headers,
                     host = headers.host;
 
+                let randomDomain = this.domainKeys.get(host.split('.')[0]);
+                if (randomDomain) {
+                    url = randomDomain + req.url;
+                }else{
+                    var arr = url.split('/');
+                    randomDomain = this.domainKeys.get(arr.shift());
+                    if (randomDomain) {
+                        url = randomDomain + arr.join('/');
+                    }
+                }
+
+                if (host && host.indexOf('nb2hi4') == 0) {
+                    url = baseCoder.decode32(host.split('.')[0]) + req.url;
+                }
+
+                if (url.indexOf('nb2hi4') == 0) {
+                    var arr = url.split('/');
+                    url = baseCoder.decode32(arr.shift()) + arr.join('/');
+                }
+
                 if (url == '') {
                     if (req.method.toLowerCase() == 'post') {
                         //console.log(data);
@@ -94,26 +114,6 @@ module.exports = class AgentServer {
                         });
                     }
                     return;
-                }
-
-                let randomDomain = this.domainKeys.get(host.split('.')[0]);
-                if (randomDomain) {
-                    url = randomDomain + req.url;
-                }else{
-                    var arr = url.split('/');
-                    randomDomain = this.domainKeys.get(arr.shift());
-                    if (randomDomain) {
-                        url = randomDomain + arr.join('/');
-                    }
-                }
-
-                if (host && host.indexOf('nb2hi4') == 0) {
-                    url = baseCoder.decode32(host.split('.')[0]) + req.url;
-                }
-
-                if (url.indexOf('nb2hi4') == 0) {
-                    var arr = url.split('/');
-                    url = baseCoder.decode32(arr.shift()) + arr.join('/');
                 }
                 console.log(`[${new Date()}] - request[${req.method}]: ${req.url}`);
                 if (url.indexOf('http') !== 0) {
