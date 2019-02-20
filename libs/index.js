@@ -16,11 +16,13 @@ module.exports = class AgentServer {
             cache: true,
             key: '__AS__',
             maxAge: 1000 * 60 * 60 * 24,
+            maps: {},
             port: 8000
         }, option);
         this.agentMaps = new Map();
         this.timer = new Map();
         this.cache = {};
+        this.domainKeys = new Map();
         this.init();
     }
 
@@ -53,23 +55,31 @@ module.exports = class AgentServer {
                 let headers = req.headers,
                     host = headers.host;
 
-                if (host && host.indexOf('nb2hi4') == 0) {
-                    url = baseCoder.decode32(host.split('.')[0]) + req.url;
-                }
-
                 if (url == '') {
                     if (req.method.toLowerCase() == 'post') {
                         //console.log(data);
                         data = queryString.parse(data);
                         let uri = URL.parse(data.url);
                         let domain = baseCoder.encode32(`${uri.protocol}//${uri.host}`);
-                        if (data.action == 'Domain') {
-                            // res.end(`<script>window.location.href='http://${baseCoder.encode32(data.url)}.${host}'</script>`);
-                            res.end(`<script>window.location.href='http://${domain}.${host}${uri.path}';</script>`);
-                        } else {
-                            // res.end(`<script>window.location.href='/${baseCoder.encode32(data.url)}'</script>`);
-                            res.end(`<script>window.location.href='/${domain}${uri.path}';</script>`);
+                        let href='';
+                        if (data.action == 'Base32Domain') {
+                            // res.end(`<script>window.location.href='http://${domain}.${host}${uri.path}';</script>`);
+                            href=`http://${domain}.${host}${uri.path}`;
+                        } else if (data.action == 'Base32') {
+                            // res.end(`<script>window.location.href='/${domain}${uri.path}';</script>`);
+                            href=`/${domain}${uri.path}`;
+                        } else{
+                            let randomDomain = 'as'+this.getId(8);
+                            this.domainKeys.set(randomDomain,`${uri.protocol}//${uri.host}`);
+                            if (data.action == 'RandomDomain') {
+                                // res.end(`<script>window.location.href='http://${randomDomain}.${host}${uri.path}';</script>`);
+                                href=`http://${randomDomain}.${host}${uri.path}`;
+                            }else {
+                                // res.end(`<script>window.location.href='/${randomDomain}${uri.path}';</script>`);
+                                href=`/${randomDomain}${uri.path}`;
+                            }
                         }
+                        res.end(`<script>window.location.href='${href}';</script>`);
                     } else {
                         fs.readFile('./index.html', function (err, html) {
                             if (err) {
@@ -85,6 +95,22 @@ module.exports = class AgentServer {
                     }
                     return;
                 }
+
+                let randomDomain = this.domainKeys.get(host.split('.')[0]);
+                if (randomDomain) {
+                    url = randomDomain + req.url;
+                }else{
+                    var arr = url.split('/');
+                    randomDomain = this.domainKeys.get(arr.shift());
+                    if (randomDomain) {
+                        url = randomDomain + arr.join('/');
+                    }
+                }
+
+                if (host && host.indexOf('nb2hi4') == 0) {
+                    url = baseCoder.decode32(host.split('.')[0]) + req.url;
+                }
+
                 if (url.indexOf('nb2hi4') == 0) {
                     var arr = url.split('/');
                     url = baseCoder.decode32(arr.shift()) + arr.join('/');
