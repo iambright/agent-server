@@ -55,6 +55,17 @@ module.exports = class AgentServer {
                 let headers = req.headers,
                     host = headers.host;
 
+                let routerDomain = this.opts.maps[host.split('.')[0]];
+                if (routerDomain) {
+                    url = routerDomain + req.url;
+                }else{
+                    var arr = url.split('/');
+                    routerDomain = this.opts.maps[arr.shift()];
+                    if (routerDomain) {
+                        url = routerDomain + arr.join('/');
+                    }
+                }
+
                 let randomDomain = this.domainKeys.get(host.split('.')[0]);
                 if (randomDomain) {
                     url = randomDomain + req.url;
@@ -83,19 +94,15 @@ module.exports = class AgentServer {
                         let domain = baseCoder.encode32(`${uri.protocol}//${uri.host}`);
                         let href='';
                         if (data.action == 'Base32Domain') {
-                            // res.end(`<script>window.location.href='http://${domain}.${host}${uri.path}';</script>`);
                             href=`http://${domain}.${host}${uri.path}`;
                         } else if (data.action == 'Base32') {
-                            // res.end(`<script>window.location.href='/${domain}${uri.path}';</script>`);
                             href=`/${domain}${uri.path}`;
                         } else{
                             let randomDomain = 'as'+this.getId(8);
                             this.domainKeys.set(randomDomain,`${uri.protocol}//${uri.host}`);
                             if (data.action == 'RandomDomain') {
-                                // res.end(`<script>window.location.href='http://${randomDomain}.${host}${uri.path}';</script>`);
                                 href=`http://${randomDomain}.${host}${uri.path}`;
                             }else {
-                                // res.end(`<script>window.location.href='/${randomDomain}${uri.path}';</script>`);
                                 href=`/${randomDomain}${uri.path}`;
                             }
                         }
@@ -167,7 +174,7 @@ module.exports = class AgentServer {
     }
 
     getAgent(id) {
-        console.log("agent length", this.agentMaps.size);
+        //console.log("agent length", this.agentMaps.size);
         if (this.agentMaps.has(id) && this.timer.has(id)) {
             const timeout = this.timer.get(id);
             if (timeout) {
@@ -186,19 +193,3 @@ module.exports = class AgentServer {
         this.timer.delete(id);
     }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
